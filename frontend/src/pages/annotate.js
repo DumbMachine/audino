@@ -29,6 +29,7 @@ class Annotate extends React.Component {
     this.state = {
       isPlaying: false,
       projectId,
+      timeTracked: new Date().getTime(),
       dataId,
       labels: {},
       labelsUrl: `/api/projects/${projectId}/labels`,
@@ -108,6 +109,7 @@ class Annotate extends React.Component {
           is_marked_for_review,
           segmentations,
           filename,
+          time_track,
         } = response[1].data;
 
         const regions = segmentations.map((segmentation) => {
@@ -184,6 +186,10 @@ class Annotate extends React.Component {
     const zoom = Number(e.target.value);
     wavesurfer.zoom(zoom);
     this.setState({ zoom });
+  }
+
+  componentWillUnmount() {
+    console.log("Total time tracked: ", this.state.timeTracked);
   }
 
   handleIsMarkedForReview(e) {
@@ -366,6 +372,7 @@ class Annotate extends React.Component {
         <Helmet>
           <title>Annotate</title>
         </Helmet>
+        somet
         <div className="container h-100">
           <div className="h-100 mt-5 text-center">
             {errorMessage ? (
@@ -510,7 +517,7 @@ class Annotate extends React.Component {
                                   selectedSegment.data.annotations &&
                                   selectedSegment.data.annotations[key] &&
                                   selectedSegment.data.annotations[key][
-                                  "values"
+                                    "values"
                                   ]) ||
                                 (value["type"] === "multiselect" ? [] : "")
                               }

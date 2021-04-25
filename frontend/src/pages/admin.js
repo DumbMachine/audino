@@ -233,6 +233,9 @@ class Admin extends React.Component {
                           </th>
                           <td
                             className="align-middle"
+                            style={{
+                              color: "#00f",
+                            }}
                             onClick={(e) => {
                               this.setModalShow(true);
                               this.setState({
@@ -242,13 +245,7 @@ class Admin extends React.Component {
                               });
                             }}
                           >
-                            <p
-                              style={{
-                                color: "#00f",
-                              }}
-                            >
-                              {project["name"]}
-                            </p>
+                            {project["name"]}
                           </td>
                           <td className="align-middle">
                             {project["created_by"]}

@@ -112,11 +112,52 @@ def fetch_project_analytics(project_id):
         users = project.users
         user_progress = {"total_users": len(users)}
         # Getting user-wise progress on this project
+        statuses = ["pending", "completed", "marked_review", "all"]
         for user in users:
-            something = Data.query.filter_by(
-                project_id=project_id, assigned_user_id=user.id
-            ).count()
-            user_progress[user.username] = something
+            segmentations = db.session.query(Segmentation.data_id).distinct().subquery()
+
+            data = {}
+
+            data["pending"] = (
+                db.session.query(Data)
+                .filter(Data.assigned_user_id == request_user.id)
+                .filter(Data.project_id == project_id)
+                .filter(Data.id.notin_(segmentations))
+                .distinct()
+                .order_by(Data.last_modified.desc())
+                .count()
+            )
+
+            data["completed"] = (
+                db.session.query(Data)
+                .filter(Data.assigned_user_id == request_user.id)
+                .filter(Data.project_id == project_id)
+                .filter(Data.id.in_(segmentations))
+                .distinct()
+                .order_by(Data.last_modified.desc())
+                .count()
+            )
+
+            data["marked_review"] = (
+                Data.query.filter_by(
+                    assigned_user_id=request_user.id,
+                    project_id=project_id,
+                    is_marked_for_review=True,
+                )
+                .order_by(Data.last_modified.desc())
+                .count()
+            )
+
+            data["all"] = (
+                Data.query.filter_by(
+                    assigned_user_id=request_user.id, project_id=project_id
+                )
+                .order_by(Data.last_modified.desc())
+                .count()
+            )
+
+            user_progress[user.username] = data
+
     except Exception as e:
         app.logger.error(f"No project exists with Project ID: {project_id}")
         app.logger.error(e)
@@ -131,7 +172,6 @@ def fetch_project_analytics(project_id):
         jsonify(
             information={
                 "users_progress": user_progress,
-                "users": [str(user) for user in users],
             }
         ),
         200,
@@ -461,7 +501,6 @@ def get_labels_for_project(project_id):
 @jwt_required
 def get_segmentations_for_data(project_id, data_id):
     identity = get_jwt_identity()
-
     try:
         request_user = User.query.filter_by(username=identity["username"]).first()
         project = Project.query.get(project_id)

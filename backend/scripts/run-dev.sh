@@ -18,9 +18,6 @@ source "${venv}/bin/activate"
 echo "Installing dependencies"
 pip3 install -r "${app}/requirements.txt"
 
-echo "Connecting to database"
-python3 "${app}/scripts/wait_for_database.py"
-
 echo "Applying new migrations"
 cd "${app}" && flask db migrate || true
 cd "${app}" && flask db upgrade || true

@@ -42,7 +42,6 @@ def fetch_current_user_projects():
 @jwt_required
 def fetch_data_for_project(project_id):
     identity = get_jwt_identity()
-
     page = request.args.get("page", 1, type=int)
     active = request.args.get("active", "pending", type=str)
 
@@ -86,6 +85,11 @@ def fetch_data_for_project(project_id):
         ).order_by(Data.last_modified.desc())
 
         paginated_data = data[active].paginate(page, 10, False)
+
+        app.logger.info(
+            [data.assigned_user_id for data in db.session.query(Data).all()]
+            # db.session.query(Data).filter(Data.assigned_user_id == request_user.id).all()
+        )
 
         next_page = paginated_data.next_num if paginated_data.has_next else None
         prev_page = paginated_data.prev_num if paginated_data.has_prev else None
