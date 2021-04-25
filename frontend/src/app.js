@@ -10,6 +10,8 @@ import { createStore, withStore } from "@spyna/react-store";
 import { createBrowserHistory } from "history";
 import { Helmet } from "react-helmet";
 
+import Analytics from "./components/analytics";
+
 import {
   Admin,
   Home,
@@ -118,6 +120,7 @@ class App extends React.Component {
               }}
             />
             <Route path="/empty" component={null} key="empty" />
+            <Route path="/debug" component={Analytics} />
             <PrivateRoute exact path="/admin" component={Admin} />
             <PrivateRoute exact path="/dashboard" component={Dashboard} />
             <PrivateRoute

@@ -92,6 +92,52 @@ def fetch_all_projects():
     return jsonify(projects=response), 200
 
 
+@api.route("/projects/<int:project_id>/analytics", methods=["GET"])
+@jwt_required
+def fetch_project_analytics(project_id):
+    """
+    Things that we need:
+    1. Number of samples
+    2. Number of users ( done )
+    """
+    identity = get_jwt_identity()
+    request_user = User.query.filter_by(username=identity["username"]).first()
+    is_admin = True if request_user.role.role == "admin" else False
+
+    if is_admin == False:
+        return jsonify(message="Unauthorized access!"), 401
+
+    try:
+        project = Project.query.get(project_id)
+        users = project.users
+        user_progress = {"total_users": len(users)}
+        # Getting user-wise progress on this project
+        for user in users:
+            something = Data.query.filter_by(
+                project_id=project_id, assigned_user_id=user.id
+            ).count()
+            user_progress[user.username] = something
+    except Exception as e:
+        app.logger.error(f"No project exists with Project ID: {project_id}")
+        app.logger.error(e)
+        return (
+            jsonify(
+                message="No project exists with given project_id", project_id=project_id
+            ),
+            404,
+        )
+
+    return (
+        jsonify(
+            information={
+                "users_progress": user_progress,
+                "users": [str(user) for user in users],
+            }
+        ),
+        200,
+    )
+
+
 @api.route("/projects/<int:project_id>", methods=["GET"])
 @jwt_required
 def fetch_project(project_id):

@@ -10,6 +10,8 @@ import ManageUsersProjectForm from "./forms/manageUsersProjectForm";
 import CreateLabelValueForm from "./forms/createLabelValuelForm";
 import EditLabelValueForm from "./forms/editLabelValueForm";
 
+import Analytics from "../components/analytics";
+
 const FormModal = (props) => {
   return (
     <Modal
@@ -48,6 +50,10 @@ const FormModal = (props) => {
             labelId={props.labelId}
             labelValueId={props.labelValueId}
           />
+        ) : null}
+        {console.log("props to after", props)}
+        {props.formType === "SHOW_ANALYTICS" ? (
+          <Analytics projectId={props.projectId} />
         ) : null}
       </Modal.Body>
     </Modal>

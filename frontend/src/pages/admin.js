@@ -231,7 +231,25 @@ class Admin extends React.Component {
                           <th scope="row" className="align-middle">
                             {index + 1}
                           </th>
-                          <td className="align-middle">{project["name"]}</td>
+                          <td
+                            className="align-middle"
+                            onClick={(e) => {
+                              this.setModalShow(true);
+                              this.setState({
+                                formType: "SHOW_ANALYTICS",
+                                projectId: project["project_id"],
+                                title: "Analytics Dashboard",
+                              });
+                            }}
+                          >
+                            <p
+                              style={{
+                                color: "#00f",
+                              }}
+                            >
+                              {project["name"]}
+                            </p>
+                          </td>
                           <td className="align-middle">
                             {project["created_by"]}
                           </td>
