@@ -65,7 +65,7 @@ values = {
     "reference_transcription": reference_transcription,
     "username": username,
     "segmentations": segmentations,
-    "time_tracked": 0,
+    "tracked_time": 0,
     "is_marked_for_review": is_marked_for_review,
 }
 

@@ -46,7 +46,7 @@ class Data(db.Model):
     __tablename__ = "data"
 
     id = db.Column("id", db.Integer(), primary_key=True)
-    time_tracked = db.Column("time_tracked", db.Integer(), default=0)
+    tracked_time = db.Column("tracked_time", db.Integer(), default=0)
 
     project_id = db.Column(
         "project_id", db.Integer(), db.ForeignKey("project.id"), nullable=False
