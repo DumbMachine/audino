@@ -78,7 +78,7 @@ class Annotate extends React.Component {
   }
 
   componentDidMount() {
-    // anytime changed to another page
+    // fired when changing to another page
     window.onbeforeunload = function () {
       this.handleTrackTimeChange();
     }.bind(this);
@@ -231,10 +231,6 @@ class Annotate extends React.Component {
     const zoom = Number(e.target.value);
     wavesurfer.zoom(zoom);
     this.setState({ zoom });
-  }
-
-  componentWillUnmount() {
-    console.log("Total time tracked: ", this.state.timeTracked);
   }
 
   handleIsMarkedForReview(e) {
@@ -418,7 +414,6 @@ class Annotate extends React.Component {
         <Helmet>
           <title>Annotate</title>
         </Helmet>
-        somet
         <div className="container h-100">
           <div className="h-100 mt-5 text-center">
             {errorMessage ? (

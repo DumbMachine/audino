@@ -95,11 +95,6 @@ def fetch_all_projects():
 @api.route("/projects/<int:project_id>/analytics", methods=["GET"])
 @jwt_required
 def fetch_project_analytics(project_id):
-    """
-    Things that we need:
-    1. Number of samples
-    2. Number of users ( done )
-    """
     identity = get_jwt_identity()
     request_user = User.query.filter_by(username=identity["username"]).first()
     is_admin = True if request_user.role.role == "admin" else False
@@ -110,53 +105,56 @@ def fetch_project_analytics(project_id):
     try:
         project = Project.query.get(project_id)
         users = project.users
-        user_progress = {"total_users": len(users)}
-        # Getting user-wise progress on this project
-        statuses = ["pending", "completed", "marked_review", "all"]
-        for user in users:
-            segmentations = db.session.query(Segmentation.data_id).distinct().subquery()
-
-            data = {}
-
-            data["pending"] = (
-                db.session.query(Data)
-                .filter(Data.assigned_user_id == request_user.id)
-                .filter(Data.project_id == project_id)
-                .filter(Data.id.notin_(segmentations))
-                .distinct()
-                .order_by(Data.last_modified.desc())
-                .count()
+        project_time_spent = (
+            sum(
+                [
+                    data.tracked_time
+                    for data in Data.query.filter_by(
+                        assigned_user_id=request_user.id, project_id=project_id
+                    ).order_by(Data.last_modified.desc())
+                ]
             )
-
-            data["completed"] = (
-                db.session.query(Data)
-                .filter(Data.assigned_user_id == request_user.id)
-                .filter(Data.project_id == project_id)
-                .filter(Data.id.in_(segmentations))
-                .distinct()
-                .order_by(Data.last_modified.desc())
-                .count()
+            // 60
+        )
+        project_all = (
+            Data.query.filter_by(
+                assigned_user_id=request_user.id, project_id=project_id
             )
-
-            data["marked_review"] = (
-                Data.query.filter_by(
-                    assigned_user_id=request_user.id,
-                    project_id=project_id,
-                    is_marked_for_review=True,
-                )
-                .order_by(Data.last_modified.desc())
-                .count()
+            .order_by(Data.last_modified.desc())
+            .count()
+        )
+        segmentations = db.session.query(Segmentation.data_id).distinct().subquery()
+        project_progress = {
+            "marked_review": Data.query.filter_by(
+                assigned_user_id=request_user.id,
+                project_id=project_id,
+                is_marked_for_review=True,
             )
+            .order_by(Data.last_modified.desc())
+            .count()
+            / project_all,
+            "pending": db.session.query(Data)
+            .filter(Data.assigned_user_id == request_user.id)
+            .filter(Data.project_id == project_id)
+            .filter(Data.id.notin_(segmentations))
+            .distinct()
+            .order_by(Data.last_modified.desc())
+            .count()
+            / project_all,
+            "completed": db.session.query(Data)
+            .filter(Data.assigned_user_id == request_user.id)
+            .filter(Data.project_id == project_id)
+            .filter(Data.id.in_(segmentations))
+            .distinct()
+            .order_by(Data.last_modified.desc())
+            .count()
+            / project_all,
+        }
 
-            data["all"] = (
-                Data.query.filter_by(
-                    assigned_user_id=request_user.id, project_id=project_id
-                )
-                .order_by(Data.last_modified.desc())
-                .count()
-            )
-
-            user_progress[user.username] = data
+        project_users = [
+            (user.username, user.role.role)
+            for user in Project.query.get(project_id).users
+        ]
 
     except Exception as e:
         app.logger.error(f"No project exists with Project ID: {project_id}")
@@ -171,8 +169,10 @@ def fetch_project_analytics(project_id):
     return (
         jsonify(
             information={
-                "users_progress": user_progress,
-            }
+                "project_time": project_time_spent,
+                "project_progress": list(project_progress.items()),
+                "project_users": project_users,
+            },
         ),
         200,
     )
