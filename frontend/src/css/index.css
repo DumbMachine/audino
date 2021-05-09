@@ -24,3 +24,8 @@ body,
 #timeline {
   width: 100%;
 }
+
+div.guidelines-container img {
+  display: block;
+  max-width: 300px;
+}

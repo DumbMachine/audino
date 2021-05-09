@@ -232,6 +232,8 @@ class Project(db.Model):
     labels = db.relationship("Label", backref="Project")
     creator_user = db.relationship("User")
 
+    guidelines = db.Column("guidelines", db.TEXT(), default="")
+
 
 class Role(db.Model):
     __tablename__ = "role"
@@ -281,7 +283,9 @@ class Segmentation(db.Model):
     )
 
     values = db.relationship(
-        "LabelValue", secondary=annotation_table, back_populates="segmentations",
+        "LabelValue",
+        secondary=annotation_table,
+        back_populates="segmentations",
     )
 
     def set_start_time(self, start_time):

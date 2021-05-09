@@ -200,6 +200,43 @@ def update_project_users(project_id):
     )
 
 
+@api.route("/guidelines", methods=["POST"])
+def add_guidelines_to_project():
+    username = request.form.get("username", None)
+    guidelines = request.form.get("guidelines", None)
+    api_key = request.headers.get("Authorization", None)
+
+    request_user = User.query.filter_by(username=username).first()
+    is_admin = True if request_user.role.role == "admin" else False
+
+    if is_admin == False:
+        return jsonify(message="Unauthorized access!"), 401
+
+    try:
+        project = Project.query.filter_by(api_key=api_key).first()
+        project.guidelines = guidelines
+        db.session.commit()
+    except Exception as e:
+        app.logger.error(f"Error adding guidelines to project: {project.id}")
+        app.logger.error(e)
+        return (
+            jsonify(
+                message=f"Error adding guidelines to project: {project.id}",
+                type="GUIDELINES_CREATION_FAILED",
+            ),
+            500,
+        )
+
+    return (
+        jsonify(
+            project_id=project.id,
+            message=f"Guidelines assigned to project: {project.name}",
+            type="GUIDELINES_ASSIGNED_TO_PROJECT",
+        ),
+        201,
+    )
+
+
 @api.route("/projects/<int:project_id>/labels", methods=["POST"])
 @jwt_required
 def add_label_to_project(project_id):

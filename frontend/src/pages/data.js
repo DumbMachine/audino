@@ -10,6 +10,7 @@ class Data extends React.Component {
     super(props);
 
     const projectId = Number(this.props.match.params.id);
+    this.handleGuidelines = this.handleGuidelines.bind(this);
 
     const { location } = this.props;
     const params = new URLSearchParams(location.search);
@@ -18,6 +19,8 @@ class Data extends React.Component {
       data: [],
       active: params.get("active") || "pending",
       page: params.get("page") || 1,
+      guidelines: null,
+      showGuidelines: true,
       count: {
         pending: 0,
         completed: 0,
@@ -55,6 +58,7 @@ class Data extends React.Component {
           data,
           count,
           active,
+          guidelines,
           page,
           next_page,
           prev_page,
@@ -63,6 +67,7 @@ class Data extends React.Component {
           data,
           count,
           active,
+          guidelines,
           page,
           nextPage: next_page,
           prevPage: prev_page,
@@ -70,6 +75,7 @@ class Data extends React.Component {
         });
       })
       .catch((error) => {
+        console.log(error);
         this.setState({
           errorMessage: error.response.data.message,
           isDataLoading: false,
@@ -77,9 +83,20 @@ class Data extends React.Component {
       });
   }
 
+  handleGuidelines(e) {
+    e.preventDefault();
+    const currentValue = this.state.showGuidelines;
+    console.log("guidlines: ", currentValue);
+    this.setState({
+      showGuidelines: !currentValue,
+    });
+  }
+
   render() {
     const {
       projectId,
+      guidelines,
+      showGuidelines,
       isDataLoading,
       data,
       count,
@@ -100,6 +117,27 @@ class Data extends React.Component {
         </Helmet>
         <div className="container h-100">
           <div className="h-100 mt-5">
+            <div className="row border-bottom my-3">
+              <div className="col float-left">
+                <h1>Guidelines</h1>
+              </div>
+              <a
+                className={`nav-link ${
+                  showGuidelines === true ? "active" : null
+                }`}
+                onClick={this.handleGuidelines}
+              >
+                Show Guidelines
+              </a>
+            </div>
+            {showGuidelines ? (
+              guidelines ? (
+                <div
+                  className="guidelines-container"
+                  dangerouslySetInnerHTML={{ __html: guidelines }}
+                ></div>
+              ) : null
+            ) : null}
             <div className="row border-bottom my-3">
               <div className="col float-left">
                 <h1>Data</h1>

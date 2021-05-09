@@ -49,7 +49,7 @@ def fetch_data_for_project(project_id):
     try:
         request_user = User.query.filter_by(username=identity["username"]).first()
         project = Project.query.get(project_id)
-
+        guidelines = project.guidelines
         if request_user not in project.users:
             return jsonify(message="Unauthorized access!"), 401
 
@@ -116,6 +116,7 @@ def fetch_data_for_project(project_id):
             count=count_data,
             next_page=next_page,
             prev_page=prev_page,
+            guidelines=guidelines,
             page=page,
             active=active,
         ),
