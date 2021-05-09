@@ -16,3 +16,4 @@ In this guide, we'll explain how to utilize the tool to maximum potential. We as
 10. [Data Dashboard](./tutorials/data-dashboard.md)
 11. [Annotation Dashboard](./tutorials/annotation-dashboard.md)
 12. [Uploading data](./tutorials/upload-data.md)
+13. [Uploading Guidelines](./tutorials/upload-guidelines.md)
