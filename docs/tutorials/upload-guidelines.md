@@ -17,5 +17,6 @@ We provide an [example CLI script](../../examples/upload_data/upload_guidelines.
 For example, you can add data with reference transcripts:
 
 ```sh
-API_KEY=4595c35d8dfc4ee1a0d3a40ec6c7ccec python3 upload_guidelines.py --host localhost --port 5000 --guidelines "<p>Sample Guidelines for this project.</p><img src='https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT1E5SKljnQvLKVwFk1dcOTKNBVGvbyDNl_qA&usqp=CAU'/>"
+API_KEY=4595c35d8dfc4ee1a0d3a40ec6c7ccec python3 upload_guidelines.py --host localhost --port 5000 --guidelines "<p>Sample Guidelines for this project.</p><iframe width='560' height='315' src='https://www.youtube.com/watch?v=dQw4w9WgXcQ' frameborder='0' allowfullscreen></iframe>
+"
 ```
